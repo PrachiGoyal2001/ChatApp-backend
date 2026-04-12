@@ -5,6 +5,7 @@ import cors from "cors";
 import { createServer } from "http";
 import connectDB from "./config/db.js";
 import { setupWebSocket } from "./websocket/socketHandler.js";
+import dotenv from "dotenv";
 
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
@@ -15,19 +16,20 @@ const PORT = process.env.PORT || 3000;
 const MONGO_URL = process.env.MONGO_URL || "mongodb://localhost:27017/chatAppDb";
 const isProduction = process.env.NODE_ENV === "production";
 
+dotenv.config();
 await connectDB();
+
+app.set("trust proxy", 1);
 
 app.use(cors({
   origin:  [
     "http://localhost:9000",
-    "https://chatapp-backend-v4hm.onrender.com"
+    "https://chat-app-frontend-smoky-seven.vercel.app/"
   ],
   credentials: true,
 }));
 
 app.use(express.json());
-
-app.set("trust proxy", 1);
 
 app.use(session({
   secret: process.env.SESSION_SECRET || "secret",
