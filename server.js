@@ -24,10 +24,12 @@ app.set("trust proxy", 1);
 app.use(cors({
   origin:  [
     "http://localhost:9000",
-    "https://chat-app-frontend-smoky-seven.vercel.app/"
+    "https://chat-app-frontend-smoky-seven.vercel.app"
   ],
   credentials: true,
 }));
+
+app.options("*", cors()); 
 
 app.use(express.json());
 
