@@ -13,21 +13,32 @@ import messageRoutes from "./routes/messageRoutes.js";
 const app = express();
 const PORT = process.env.PORT || 3000;
 const MONGO_URL = process.env.MONGO_URL || "mongodb://localhost:27017/chatAppDb";
+const isProduction = process.env.NODE_ENV === "production";
 
 await connectDB();
 
 app.use(cors({
-  origin: "http://localhost:9000",
+  origin:  [
+    "http://localhost:9000",
+    "https://chatapp-backend-v4hm.onrender.com"
+  ],
   credentials: true,
 }));
 
 app.use(express.json());
+
+app.set("trust proxy", 1);
 
 app.use(session({
   secret: process.env.SESSION_SECRET || "secret",
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({ mongoUrl: MONGO_URL }),
+  cookie: {
+    httpOnly: true,
+    secure: isProduction,        // ✅ REQUIRED for HTTPS (Render)
+    sameSite: isProduction ? "none" : "lax",    // ✅ REQUIRED for cross-origin
+  },
 }));
 
 app.use("/auth", authRoutes);
