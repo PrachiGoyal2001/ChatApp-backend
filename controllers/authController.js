@@ -4,7 +4,9 @@ import User from "../models/User.js";
 export const register = async (req, res) => {
   try {
     const { username, password, email } = req.body;
-
+    if (!username?.trim() || !password || !email?.trim()) {
+      return res.status(400).json({ message: "All fields required" });
+    }
     const existingUser = await User.findOne({
       $or: [{ username }, { email }],
     });
@@ -21,8 +23,8 @@ export const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await User.create({
-      username,
-      email,
+      username: username.trim(),
+      email: email.trim().toLowerCase(),
       password: hashedPassword,
     });
 
@@ -36,20 +38,24 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { username, password } = req.body;
+  try {
+    const { username, password } = req.body;
 
-  const user = await User.findOne({ username });
+    const user = await User.findOne({ username });
 
-  if (user && (await bcrypt.compare(password, user.password))) {
-    req.session.userId = user.id;
+    if (user && (await bcrypt.compare(password, user.password))) {
+      req.session.userId = user.id;
 
-    return res.status(200).json({
-      message: "Logged in Successfully",
-      userId: user.id,
-    });
+      return res.status(200).json({
+        message: "Logged in Successfully",
+        userId: user.id,
+      });
+    }
+
+    return res.status(401).json({ message: "Invalid credentials" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
   }
-
-  return res.status(401).json({ message: "Invalid credentials" });
 };
 
 export const checkAuth = (req, res) => {

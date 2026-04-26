@@ -4,5 +4,11 @@ export const isAuthenticated = (req, res, next) => {
       message: "Unauthorized",
     });
   }
+
+  // attach user info to request
+  req.user = {
+    id: req.session.userId
+  };
+
   next();
 };

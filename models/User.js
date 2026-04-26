@@ -4,13 +4,13 @@ const UserSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
-    unique: true, 
+    unique: true,
     trim: true
   },
   email: {
     type: String,
     required: true,
-    unique: true, 
+    unique: true, // Unique automatcially creates Indexing
     lowercase: true,
     trim: true
   },
@@ -18,7 +18,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true
   }
-});
+}, { timestamps: true });
 
 const User = mongoose.model("User", UserSchema);
 export default User;
