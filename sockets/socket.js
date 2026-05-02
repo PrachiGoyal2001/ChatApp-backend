@@ -1,4 +1,4 @@
-import { handlePrivateMessage } from "./socketService.js";
+import { saveMessage } from "../controllers/messageController.js";
 
 export const initSocket = (io) => {
   const onlineUsers = new Map();
@@ -34,7 +34,7 @@ export const initSocket = (io) => {
 
         if (!from || !to || !message) return;
 
-        const { conversation, messageDoc } = await handlePrivateMessage(data);
+        const { conversation, messageDoc } = await saveMessage(data);
 
         const payload = {
           _id: messageDoc._id,

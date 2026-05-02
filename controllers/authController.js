@@ -22,13 +22,15 @@ export const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await User.create({
+    const newUser = await User.create({
       username: username.trim(),
       email: email.trim().toLowerCase(),
       password: hashedPassword,
     });
 
-    res.status(201).json({ message: "User registered successfully" });
+    req.session.userId = newUser._id;
+
+    res.status(201).json({ message: "User registered and logged in successfully" });
   } catch (err) {
     res.status(500).json({
       message: "Something went wrong",
@@ -44,7 +46,7 @@ export const login = async (req, res) => {
     const user = await User.findOne({ username });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      req.session.userId = user.id;
+      req.session.userId = user._id;
 
       return res.status(200).json({
         message: "Logged in Successfully",
