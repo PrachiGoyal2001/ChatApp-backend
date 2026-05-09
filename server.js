@@ -3,7 +3,7 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 import cors from "cors";
 import { createServer } from "http";
-import { Server } from "socket.io";   // ✅ NEW
+import { Server } from "socket.io";
 import connectDB from "./config/db.js";
 import dotenv from "dotenv";
 import sharedSession from "express-socket.io-session";
@@ -11,6 +11,7 @@ import sharedSession from "express-socket.io-session";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
 
 // ✅ import new socket setup
 import { initSocket } from "./sockets/socket.js";
@@ -52,9 +53,11 @@ const sessionMiddleware = session({
 app.use(sessionMiddleware);
 
 // ✅ ROUTES
+app.use("/uploads", express.static("uploads"));
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/messages", messageRoutes);
+app.use("/upload", uploadRoutes);
 
 // ✅ CREATE HTTP SERVER
 const server = createServer(app);

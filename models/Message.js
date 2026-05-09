@@ -19,12 +19,27 @@ const messageSchema = new mongoose.Schema({
   text: {
     type: String,
     trim: true,
-    required: true
+    default: "",
   },
   read: {
     type: Boolean,
     default: false
-  }
+  },
+  files: [
+    {
+      url: {
+        type: String,
+      },
+
+      fileName: {
+        type: String,
+      },
+
+      fileType: {
+        type: String,
+      },
+    },
+  ],
 }, { timestamps: true });
 
 // ✅ ADD INDEXES HERE

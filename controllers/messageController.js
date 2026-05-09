@@ -38,8 +38,8 @@ export const markAsRead = async (req, res) => {
   }
 };
 
-export const saveMessage = async (data)=> {
-  const { from, to, message } = data;
+export const saveMessage = async (data) => {
+  const { from, to, message, files = [], } = data;
 
   const participants = [from, to].sort();
 
@@ -58,11 +58,12 @@ export const saveMessage = async (data)=> {
     sender: from,
     receiver: to,
     text: message,
+    files,
     read: false
   });
 
   conversation.lastMessage = {
-    text: message,
+    text: message || (files.length && files[files.length-1].fileName),
     sender: from,
     createdAt: messageDoc.createdAt
   };

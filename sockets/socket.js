@@ -30,9 +30,9 @@ export const initSocket = (io) => {
 
     socket.on("private_message", async (data) => {
       try {
-        const { from, to, message } = data;
+        const { from, to } = data;
 
-        if (!from || !to || !message) return;
+        if (!from || !to) return;
 
         const { conversation, messageDoc } = await saveMessage(data);
 
@@ -42,6 +42,7 @@ export const initSocket = (io) => {
           sender: messageDoc.sender,
           receiver: messageDoc.receiver,
           text: messageDoc.text,
+          files: messageDoc.files || [],
           createdAt: messageDoc.createdAt,
           read: messageDoc.read,
         };
