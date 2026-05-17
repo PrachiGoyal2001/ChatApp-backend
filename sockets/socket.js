@@ -67,6 +67,66 @@ export const initSocket = (io) => {
         userId,
       });
     });
+    
+    socket.on("call_user", (data) => {
+      const {
+        to,
+        from,
+        offer,
+        isVideoCall,
+        calledUsername,
+      } = data;
+
+      io.to(to).emit("incoming_call", {
+        from,
+        offer,
+        isVideoCall,
+        calledUsername,
+      });
+    });
+
+    socket.on("answer_call", (data) => {
+      const {
+        to,
+        answer,
+      } = data;
+
+      io.to(to).emit("call_answered", {
+        answer,
+      });
+    });
+
+    socket.on("ice_candidate", (data) => {
+      const {
+        to,
+        candidate,
+      } = data;
+
+      io.to(to).emit("ice_candidate", {
+        candidate,
+      });
+    });
+
+    socket.on("video_upgrade_offer", ({ to, from, offer }) => {
+      io.to(to).emit("video_upgrade_offer", {
+        from,
+        offer,
+      });
+    });
+
+    socket.on("video_upgrade_answer", ({ to, answer }) => {
+      io.to(to).emit("video_upgrade_answer", {
+        answer,
+      });
+    });
+
+    socket.on("reject_call", ({ to }) => {
+      io.to(to).emit("call_rejected");
+    });
+
+    socket.on("end_call", ({ to }) => {
+      io.to(to).emit("call_ended");
+    });
 
     socket.on("disconnect", () => {
       let disconnectedUserId = null;
