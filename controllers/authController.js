@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.js";
+import { createToken, verifyToken } from "../utils/jwt.js";
 
 export const register = async (req, res) => {
   try {
@@ -28,9 +29,13 @@ export const register = async (req, res) => {
       password: hashedPassword,
     });
 
-    req.session.userId = newUser._id;
+    const token = createToken({ userId: newUser._id.toString() });
 
-    res.status(201).json({ message: "User registered and logged in successfully" });
+    res.status(201).json({
+      message: "User registered and logged in successfully",
+      userId: newUser._id,
+      token,
+    });
   } catch (err) {
     res.status(500).json({
       message: "Something went wrong",
@@ -46,11 +51,12 @@ export const login = async (req, res) => {
     const user = await User.findOne({ username });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      req.session.userId = user._id;
+      const token = createToken({ userId: user._id.toString() });
 
       return res.status(200).json({
         message: "Logged in Successfully",
-        userId: user.id,
+        userId: user._id,
+        token,
       });
     }
 
@@ -61,17 +67,17 @@ export const login = async (req, res) => {
 };
 
 export const checkAuth = (req, res) => {
-  if (req.session?.userId) {
-    return res.json({ loggedIn: true, user: req.session.userId });
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  const payload = verifyToken(token);
+
+  if (payload?.userId) {
+    return res.json({ loggedIn: true, user: payload.userId });
   }
+
   res.json({ loggedIn: false });
 };
 
 export const logout = (req, res) => {
-  req.session.destroy((err) => {
-    if (err) return res.status(500).send("Logout failed");
-
-    res.clearCookie("connect.sid");
-    res.status(200).json({ message: "Logged out Successfully" });
-  });
+  res.status(200).json({ message: "Logged out Successfully" });
 };

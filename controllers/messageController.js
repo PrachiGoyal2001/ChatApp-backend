@@ -21,7 +21,7 @@ export const getMessages = async (req, res) => {
 export const markAsRead = async (req, res) => {
   try {
     const { conversationId } = req.body;
-    const userId = req.session.userId;
+    const userId = req.user.id;
 
     await Message.updateMany(
       {
