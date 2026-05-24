@@ -42,7 +42,6 @@ const messageSchema = new mongoose.Schema({
   ],
 }, { timestamps: true });
 
-// ✅ ADD INDEXES HERE
 messageSchema.index({ conversationId: 1, createdAt: 1 });
 messageSchema.index({ receiver: 1, read: 1 });
 

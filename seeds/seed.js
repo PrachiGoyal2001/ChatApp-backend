@@ -9,30 +9,30 @@ import Message from "../models/Message.js";
 dotenv.config();
 
 const password=await bcrypt.hash("123456", 10);
-// 🔌 DB CONNECT
+// DB CONNECT
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URL);
-    console.log("✅ MongoDB Connected");
+    console.log("MongoDB Connected");
   } catch (err) {
-    console.error("❌ DB Connection Error:", err.message);
+    console.error("DB Connection Error:", err.message);
     process.exit(1);
   }
 };
 
-// 🌱 SEED FUNCTION
+// SEED FUNCTION
 const seedData = async () => {
   try {
-    console.log("🌱 Seeding started...");
+    console.log("Seeding started...");
 
-    // 🧹 Clear old data
+    // Clear old data
     await User.deleteMany();
     await Conversation.deleteMany();
     await Message.deleteMany();
 
-    console.log("🧹 Old data cleared");
+    console.log("Old data cleared");
 
-    // 👤 Create Users
+    // Create Users
     const user1 = await User.create({
       username: "John",
       email: "john@gmail.com",
@@ -51,9 +51,8 @@ const seedData = async () => {
       password: password,
     });
 
-    console.log("👤 Users created");
+    console.log("Users created");
 
-    // 💬 Create Conversations
     const conv1 = await Conversation.create({
       participants: [user1._id, user2._id],
       lastMessage: {
@@ -72,9 +71,8 @@ const seedData = async () => {
       },
     });
 
-    console.log("💬 Conversations created");
+    console.log("Conversations created");
 
-    // ✉️ Create Messages (Conversation 1)
     await Message.insertMany([
       {
         conversationId: conv1._id,
@@ -99,7 +97,6 @@ const seedData = async () => {
       },
     ]);
 
-    // ✉️ Messages (Conversation 2)
     await Message.insertMany([
       {
         conversationId: conv2._id,
@@ -117,16 +114,15 @@ const seedData = async () => {
       },
     ]);
 
-    console.log("✉️ Messages created");
+    console.log("Messages created");
 
-    console.log("🎉 SEEDING COMPLETED SUCCESSFULLY");
+    console.log("SEEDING COMPLETED SUCCESSFULLY");
 
     process.exit();
   } catch (err) {
-    console.error("❌ Seeding Error:", err.message);
+    console.error("Seeding Error:", err.message);
     process.exit(1);
   }
 };
 
-// 🚀 RUN
 connectDB().then(seedData);

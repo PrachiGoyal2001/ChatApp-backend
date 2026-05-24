@@ -15,10 +15,10 @@ export const initSocket = (io) => {
       const userSockets = onlineUsers.get(userId);
       userSockets.add(socket.id);
 
-      // ✅ Send current online users
+      // Send current online users
       socket.emit("online_users", Array.from(onlineUsers.keys()));
 
-      // ✅ Only broadcast if first connection
+      // Only broadcast if first connection
       if (userSockets.size === 1) {
         socket.broadcast.emit("user_online", userId);
       }

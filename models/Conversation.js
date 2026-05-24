@@ -9,7 +9,6 @@ const conversationSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-// ✅ ADD INDEX HERE
 conversationSchema.index({ participants: 1 });
 
 const Conversation = mongoose.model("Conversation", conversationSchema);
