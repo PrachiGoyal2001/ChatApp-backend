@@ -66,16 +66,27 @@ export const login = async (req, res) => {
   }
 };
 
-export const checkAuth = (req, res) => {
+export const checkAuth = async (req, res) => {
   const authHeader = req.headers.authorization || "";
   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
   const payload = verifyToken(token);
 
-  if (payload?.userId) {
-    return res.json({ loggedIn: true, user: payload.userId });
+   if (!payload?.userId) {
+    return res.status(401).json({
+      loggedIn: false,
+    });
   }
 
-  res.json({ loggedIn: false });
+  const user = await User.findById(payload.userId);
+
+  if (!user) {
+    return res.status(404).json({
+      loggedIn: false,
+      message: "User not found",
+    });
+  }
+
+  res.json({ loggedIn: true, user: payload.userId });
 };
 
 export const logout = (req, res) => {

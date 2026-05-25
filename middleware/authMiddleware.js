@@ -4,7 +4,6 @@ export const isAuthenticated = (req, res, next) => {
   const authHeader = req.headers.authorization || "";
   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
   const payload = verifyToken(token);
-  console.log("isAuthenticated", authHeader, token, payload);
 
   if (!payload?.userId) {
     return res.status(401).json({

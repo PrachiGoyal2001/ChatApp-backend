@@ -84,7 +84,6 @@ export const getUsersList = async (req, res) => {
 export const getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("_id username email createdAt updatedAt");
-    console.log("user", req.user.id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
