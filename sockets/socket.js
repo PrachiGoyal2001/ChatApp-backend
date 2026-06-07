@@ -77,6 +77,13 @@ export const initSocket = (io) => {
         calledUsername,
       } = data;
 
+      io.to(to).emit("incoming_call", {
+        from,
+        offer,
+        isVideoCall,
+        calledUsername,
+      });
+
       try {
         const { conversation, messageDoc } = await saveCallMessage({
           from,
@@ -102,13 +109,6 @@ export const initSocket = (io) => {
       } catch (err) {
         console.error("Call message log error:", err);
       }
-
-      io.to(to).emit("incoming_call", {
-        from,
-        offer,
-        isVideoCall,
-        calledUsername,
-      });
     });
 
     socket.on("answer_call", (data) => {
