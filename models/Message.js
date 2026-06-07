@@ -21,6 +21,17 @@ const messageSchema = new mongoose.Schema({
     trim: true,
     default: "",
   },
+  messageType: {
+    type: String,
+    enum: ["text", "call"],
+    default: "text",
+  },
+  call: {
+    type: {
+      type: String,
+      enum: ["audio", "video"],
+    },
+  },
   read: {
     type: Boolean,
     default: false

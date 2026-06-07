@@ -1,4 +1,4 @@
-import { saveMessage } from "../controllers/messageController.js";
+import { saveCallMessage, saveMessage } from "../controllers/messageController.js";
 
 export const initSocket = (io) => {
   const onlineUsers = new Map();
@@ -68,7 +68,7 @@ export const initSocket = (io) => {
       });
     });
     
-    socket.on("call_user", (data) => {
+    socket.on("call_user", async (data) => {
       const {
         to,
         from,
@@ -76,6 +76,32 @@ export const initSocket = (io) => {
         isVideoCall,
         calledUsername,
       } = data;
+
+      try {
+        const { conversation, messageDoc } = await saveCallMessage({
+          from,
+          to,
+          isVideoCall,
+        });
+
+        const payload = {
+          _id: messageDoc._id,
+          conversationId: conversation._id,
+          sender: messageDoc.sender,
+          receiver: messageDoc.receiver,
+          text: messageDoc.text,
+          files: messageDoc.files || [],
+          messageType: messageDoc.messageType,
+          call: messageDoc.call,
+          createdAt: messageDoc.createdAt,
+          read: messageDoc.read,
+        };
+
+        io.to(from).emit("new_message", payload);
+        io.to(to).emit("new_message", payload);
+      } catch (err) {
+        console.error("Call message log error:", err);
+      }
 
       io.to(to).emit("incoming_call", {
         from,
@@ -120,8 +146,10 @@ export const initSocket = (io) => {
       });
     });
 
-    socket.on("reject_call", ({ to }) => {
-      io.to(to).emit("call_rejected");
+    socket.on("reject_call", ({ to, reason=null }) => {
+      io.to(to).emit("call_rejected",{
+        reason,
+      });
     });
 
     socket.on("end_call", ({ to }) => {

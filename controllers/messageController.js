@@ -72,3 +72,42 @@ export const saveMessage = async (data) => {
 
   return { conversation, messageDoc };
 }
+
+export const saveCallMessage = async (data) => {
+  const { from, to, isVideoCall = false } = data;
+  const participants = [from, to].sort();
+  const callType = isVideoCall ? "video" : "audio";
+  const text = isVideoCall ? "Video call" : "Voice call";
+
+  let conversation = await Conversation.findOne({
+    participants: { $all: participants },
+  });
+
+  if (!conversation) {
+    conversation = await Conversation.create({
+      participants,
+    });
+  }
+
+  const messageDoc = await Message.create({
+    conversationId: conversation._id,
+    sender: from,
+    receiver: to,
+    text,
+    messageType: "call",
+    call: {
+      type: callType,
+    },
+    read: false,
+  });
+
+  conversation.lastMessage = {
+    text,
+    sender: from,
+    createdAt: messageDoc.createdAt,
+  };
+
+  await conversation.save();
+
+  return { conversation, messageDoc };
+};
